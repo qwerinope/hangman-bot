@@ -1,0 +1,19 @@
+services:
+  hangman:
+    build: .
+    container_name: hangman-bot
+    environment:
+      - TOKEN=$TOKEN
+      - CLIENT_ID=$CLIENT_ID
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+          ignore:
+            - node_modules/
+
+    volumes:
+      - database:/usr/src/app/db
+
+volumes:
+  database:
