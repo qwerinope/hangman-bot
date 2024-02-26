@@ -14,3 +14,7 @@ export async function setup() {
         });
     })
 }
+
+(async () =>{
+    await setup()
+})()

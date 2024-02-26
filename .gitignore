@@ -1,6 +1,7 @@
 # Secrets
 config.json
 dist/
+db/
 
 # Logs
 logs

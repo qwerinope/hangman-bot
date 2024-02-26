@@ -1,50 +1,46 @@
-import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../setup.js';
+import { sequelize } from '../setup.js'
+import Game from './game.js';
+import User from './user.js';
+import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
-interface GuessAttributes {
-  userId: string;
-  guessId?: string;
-  guessedLetter?: string;
-  guessedWord?: string;
-  isCorrect: boolean;
-}
-
-class Guess extends Model<GuessAttributes> implements GuessAttributes {
-  public userId!: string;
-  public guessId!: string;
-  public guessedLetter?: string;
-  public guessedWord?: string;
-  public isCorrect!: boolean;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+class Guess extends Model<InferAttributes<Guess>, InferCreationAttributes<Guess>> {
+    userId!: ForeignKey<User['userId']>;
+    guessId!: string;
+    guessedChar!: CreationOptional<string> | null;
+    guessedWord!: CreationOptional<string> | null;
+    isCorrect!: CreationOptional<boolean>;
+    gameId!: ForeignKey<Game['gameId']>
 }
 
 Guess.init(
-  {
-    userId: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    {
+        userId: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        guessId: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            unique: true
+        },
+        guessedChar: {
+            type: DataTypes.CHAR(1),
+        },
+        guessedWord: {
+            type: DataTypes.STRING,
+        },
+        isCorrect: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
+        gameId: {
+            type: DataTypes.UUID
+        }
     },
-    guessId: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    guessedLetter: {
-      type: DataTypes.CHAR(1),
-    },
-    guessedWord: {
-      type: DataTypes.STRING,
-    },
-    isCorrect: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Guess',
-  }
+    {
+        sequelize,
+        modelName: 'Guess',
+    }
 );
-
+  
 export default Guess;
