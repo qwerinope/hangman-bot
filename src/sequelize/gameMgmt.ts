@@ -4,7 +4,7 @@ import { ChatInputCommandInteraction, CacheType } from 'discord.js'
 export async function createGame(secretWord:string|any, interaction:ChatInputCommandInteraction<CacheType>) {
     await Game.create({
         creatorId: interaction.user.id,
-        secretWord: secretWord,
+        secretWord: secretWord.toLowerCase(),
         channelId:interaction.channelId
     })
 }

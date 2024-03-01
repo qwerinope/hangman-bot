@@ -6,8 +6,8 @@ import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreation
 class Guess extends Model<InferAttributes<Guess>, InferCreationAttributes<Guess>> {
     userId!: ForeignKey<User['userId']>;
     guessId!: string;
-    guessedChar!: CreationOptional<string> | null;
-    guessedWord!: CreationOptional<string> | null;
+    guessedChar!: CreationOptional<string>;
+    guessedWord!: CreationOptional<string>;
     isCorrect!: CreationOptional<boolean>;
     gameId!: ForeignKey<Game['gameId']>
 }

@@ -40,7 +40,7 @@ Game.init(
         },
         secretWord: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
         creatorId: {
             type: DataTypes.STRING,

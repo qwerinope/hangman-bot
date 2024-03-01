@@ -9,14 +9,31 @@ export async function createGuess(guess:string, channelId:string, userId:string)
             }
         })
 
-        if (!game) return 'No active game exists.'
+        if (!game) return {success: false, data: "There is no active game in this channel."}
         // If the guess is only for a single character
         if (guess.length === 1) {
-            game.createGuess()
+            const isCorrect = game.secretWord.includes(guess.toLowerCase())
+
+            await game.createGuess({
+                userId: userId,
+                guessedChar: guess.toLowerCase(),
+                isCorrect: isCorrect
+            }).then(()=>{
+                return {success: true, data: {guess, isCorrect}}
+            })
+        } else {
+            const isCorrect = (game.secretWord === guess.toLowerCase())
+
+            await game.createGuess({
+                userId: userId,
+                guessedWord: guess.toLowerCase(),
+                isCorrect: isCorrect
+            }).then(()=>{
+                return {success: true, data: {guess, isCorrect}}
+            })
+
         }
-        
-        return true
     } catch (error) {
-        return false
+        return {success: false, data: "Fuck"}
     }
 }
