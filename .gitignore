@@ -1,7 +1,7 @@
 # Secrets
 config.json
 dist/
-db/
+db/data.sqlite
 
 # Logs
 logs
