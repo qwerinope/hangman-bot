@@ -1,26 +1,26 @@
-import { sqliteTable, numeric, integer, text } from "drizzle-orm/sqlite-core"
+import { pgTable, text, numeric, char, integer, pgEnum, boolean, uuid } from "drizzle-orm/pg-core"
 
-export const user = sqliteTable("User", {
+export const statusEnum = pgEnum('status', ['won', 'lost', 'inprogress'])
+
+export const user = pgTable("User", {
 	userId: numeric("userId").primaryKey().notNull(),
-	gamesStarted: integer("gamesStarted").default(1).notNull(),
 });
 
-export const games = sqliteTable("Games", {
-	gameId: numeric("gameId").primaryKey(),
+export const games = pgTable("Games", {
+	gameId: uuid('gameId').primaryKey().defaultRandom(),
 	channelId: numeric("channelId").notNull(),
-	secretWord: numeric("secretWord").notNull(),
-	creatorId: numeric("creatorId").notNull().references(() => user.userId, { onDelete: "cascade", onUpdate: "cascade" } ),
+	secretWord: text("secretWord").notNull(),
+	creatorId: numeric("creatorId").notNull().references(() => user.userId, { onDelete: "cascade", onUpdate: "cascade" }),
 	incorrectGuessesRemaining: integer("incorrectGuessesRemaining").default(10).notNull(),
-	status: text("status").default("ongoing").notNull(),
-	gameOver: numeric("gameOver").notNull(),
+	status: statusEnum('status').default("inprogress").notNull(),
+	gameOver: boolean("gameOver").notNull().default(false),
 });
 
-export const guesses = sqliteTable("Guesses", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	userId: numeric("userId").notNull().references(() => user.userId, { onDelete: "cascade", onUpdate: "cascade" } ),
-	guessId: numeric("guessId"),
-	guessedChar: numeric("guessedChar"),
-	guessedWord: numeric("guessedWord"),
-	isCorrect: numeric("isCorrect").notNull(),
-	gameId: numeric("gameId").references(() => games.gameId, { onDelete: "cascade", onUpdate: "cascade" } ),
+export const guesses = pgTable("Guesses", {
+	userId: numeric("userId").notNull().references(() => user.userId, { onDelete: "cascade", onUpdate: "cascade" }),
+	guessId: uuid("guessId").primaryKey().defaultRandom(),
+	guessedChar: char("guessedChar"),
+	guessedWord: text("guessedWord"),
+	isCorrect: boolean("isCorrect").notNull(),
+	gameId: uuid("gameId").references(() => games.gameId, { onDelete: "cascade", onUpdate: "cascade" }),
 });

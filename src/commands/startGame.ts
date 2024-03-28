@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, Message, SlashCommandBuilder } from "discord.js";
-import { createGame, isGameActive } from '../sequelize/gameMgmt.js'
+import { createGame, isGameActive } from '../drizzle/gameMgmt.js'
 
 export const command = new SlashCommandBuilder()
     .setName('hangman')
@@ -10,18 +10,27 @@ export const command = new SlashCommandBuilder()
             .setRequired(true)
     )
 
-export async function execute(interaction:ChatInputCommandInteraction<CacheType>) {
+export async function execute(interaction: ChatInputCommandInteraction<CacheType>) {
     const secretword = interaction.options.get('input')?.value!.toString().toLowerCase()
+
+    // The following code is fucking useless but typescript need it
+    if (!secretword) return
+
     if (await isGameActive(interaction)) {
         await interaction.reply("Can't have more than one game active in a single channel.")
+        return
     }
-    await interaction.reply('Starting game. Word chosen by: '+interaction.user.username)
+    await interaction.reply({ ephemeral: true, content: 'Starting game.' })
+
+    if (!interaction.channel) return // FUCK. THIS. AGAIN!!
+
+    await interaction.channel.send('New Game! Secret word by ' + interaction.user.username + '. Secret word has ' + secretword.length + ' characters. You have 10 attempts. Good luck!')
 
     try {
         await createGame(secretword, interaction)
     } catch (error) {
-        interaction.editReply('Failed to start hangman.')
+        await interaction.editReply('Failed to start hangman.')
         console.error(error)
     }
-    
+
 }

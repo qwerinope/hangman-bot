@@ -7,17 +7,17 @@
   "author": "qweri0p",
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^9.4.3",
     "discord.js": "^14.14.1",
     "drizzle-orm": "^0.30.2",
+    "pg": "^8.11.3",
+    "postgres": "^3.4.3",
     "typescript": "^5.3.3"
   },
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "createdb": "tsc && node dist/sequelize/setup.js"
+    "createdb": "drizzle-kit push:pg"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.9",
     "drizzle-kit": "^0.20.14"
   }
 }

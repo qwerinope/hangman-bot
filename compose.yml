@@ -1,19 +1,39 @@
 services:
   hangman:
-    build: .
-    container_name: hangman-bot
-    environment:
-      - TOKEN=$TOKEN
-      - CLIENT_ID=$CLIENT_ID
-    develop:
-      watch:
-        - action: rebuild
-          path: .
-          ignore:
-            - node_modules/
+   build: .
+   container_name: hangman-bot
+   environment:
+     - TOKEN=$TOKEN
+     - CLIENT_ID=$CLIENT_ID
+   develop:
+     watch:
+       - action: rebuild
+         path: .
+         ignore:
+         - node_modules
 
+  postgres:
+    image: postgres:latest
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123password
     volumes:
-      - database:/usr/src/app/db
+      - db:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+
+    ports:
+      - 8080:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
 
 volumes:
-  database:
+  db:
+  pgadmin:
