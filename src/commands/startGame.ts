@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Message, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { createGame, isGameActive } from '../drizzle/gameMgmt.js'
 
 export const command = new SlashCommandBuilder()
@@ -24,6 +24,8 @@ export async function execute(interaction: ChatInputCommandInteraction<CacheType
 
     if (!interaction.channel) return // FUCK. THIS. AGAIN!!
 
+    // TODO: Make it use startingMessage() from '../messages.ts'
+    // also just make it at all in messages.ts lmao
     await interaction.channel.send('New Game! Secret word by ' + interaction.user.username + '. Secret word has ' + secretword.length + ' characters. You have 10 attempts. Good luck!')
 
     try {

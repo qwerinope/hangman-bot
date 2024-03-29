@@ -1,6 +1,9 @@
 import { CacheType, ChatInputCommandInteraction } from 'discord.js';
+import { eq, and } from 'drizzle-orm'
+import { calculateLives } from './livesMgmt.js'
 import db from './setup.js';
 import { games } from './schema.js';
+import * as messages from '../messages.js'
 
 export async function createGame(secret: string, interaction: ChatInputCommandInteraction<CacheType>) {
 	const user = interaction.user.id
@@ -10,10 +13,9 @@ export async function createGame(secret: string, interaction: ChatInputCommandIn
 			creatorId: user,
 			secretWord: secret.toLowerCase(),
 			channelId: channel,
+			incorrectGuessesRemaining: calculateLives(secret)
 		});
-		await interaction.editReply('i\'m such a good programmer')
 	} catch (error) {
-		await interaction.editReply('FUCK')
 		console.error(error)
 	}
 };
@@ -39,5 +41,29 @@ export async function isUserAllowed(interaction: ChatInputCommandInteraction<Cac
 	})
 	if (exists === undefined) return true
 	return false
+}
 
+export async function winGame(interaction: ChatInputCommandInteraction<CacheType>) {
+	await db.update(games).set({
+		status: 'won'
+	}).where(
+		and(
+			eq(games.channelId, interaction.channelId),
+			eq(games.status, 'inprogress')
+		)
+	)
+	await messages.winMessage(interaction)
+}
+
+export async function loseGame(interaction: ChatInputCommandInteraction<CacheType>) {
+	await db.update(games).set({
+		status: 'lost'
+	}).where(
+		and(
+			eq(games.channelId, interaction.channelId),
+			eq(games.status, 'inprogress')
+		)
+	)
+	// TODO: Make it pass the secret instead of 'lol'
+	await messages.loseMessage(interaction, 'lol')
 }

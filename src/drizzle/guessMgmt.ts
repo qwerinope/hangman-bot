@@ -1,12 +1,16 @@
 import { ChatInputCommandInteraction, CacheType } from 'discord.js';
 import { and, eq } from 'drizzle-orm'
 import db from './setup.js'
+import { winGame } from './gameMgmt.js'
+import { correctCharMessage } from '../messages.js'
 import { guesses, games } from './schema.js'
+import { loseLife } from './livesMgmt.js'
 
 export async function createGuess(interaction: ChatInputCommandInteraction<CacheType>, guess: string) {
 	const results = await db.select({
 		secretword: games.secretWord,
-		gameId: games.gameId
+		gameId: games.gameId,
+		lives: games.incorrectGuessesRemaining
 	}).from(games).where(
 		and(
 			eq(games.channelId, interaction.channelId),
@@ -14,38 +18,23 @@ export async function createGuess(interaction: ChatInputCommandInteraction<Cache
 		)
 	)
 
-	const { secretword, gameId } = results[0]
+	const { secretword, gameId, lives } = results[0]
 
-	let correct = false
+	const correct = secretword.includes(guess) || secretword === guess
 
-	if (guess.length === 1) {
-		// Guess a character
-		if (secretword.includes(guess)) {
-			correct = true
-			await interaction.reply('Correct! The character ' + guess + ' was in the secret!')
-		} else {
-			await interaction.reply('Wrong! \'' + guess + '\' is totally wrong you fucking idiot!')
-		}
-
-		db.insert(guesses).values({
-			gameId: gameId,
-			userId: interaction.user.id,
-			guessedChar: guess,
-			isCorrect: correct
-		})
+	if (correct && guess.length === 1) {
+		await correctCharMessage(interaction, lives)
+	} else if (correct) {
+		await winGame(interaction)
 	} else {
-		// Guess the secret word
-		if (secretword === guess) {
-			correct = true
-			await interaction.reply('Correct! The secret was \'' + guess + '\'!')
-		} else {
-			await interaction.reply('Wrong! \'' + guess + '\' is totally wrong you fucking idiot!')
-		}
-		db.insert(guesses).values({
-			gameId: gameId,
-			userId: interaction.user.id,
-			guessedWord: guess,
-			isCorrect: correct
-		})
+		await loseLife(interaction, guess.length === 1)
 	}
+
+	await db.insert(guesses).values({
+		gameId: gameId,
+		userId: interaction.user.id,
+		guess: guess,
+		guessType: guess.length === 1 ? 'char' : 'word',
+		isCorrect: correct
+	})
 }
