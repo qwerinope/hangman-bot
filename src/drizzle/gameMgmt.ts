@@ -8,17 +8,18 @@ import * as messages from '../messages.js'
 export async function createGame(secret: string, interaction: ChatInputCommandInteraction<CacheType>) {
 	const user = interaction.user.id
 	const channel = interaction.channelId
-	try {
-		await db.insert(games).values({
-			creatorId: user,
-			secretWord: secret.toLowerCase(),
-			channelId: channel,
-			incorrectGuessesRemaining: calculateLives(secret)
-		});
-	} catch (error) {
-		console.error(error)
-	}
-};
+	const lives = calculateLives(secret)
+
+	await db.insert(games).values({
+		creatorId: user,
+		secretWord: secret.toLowerCase(),
+		channelId: channel,
+		incorrectGuessesRemaining: lives
+	});
+
+	await messages.startingMessage(interaction, secret, lives)
+
+}
 
 export async function isGameActive(interaction: ChatInputCommandInteraction<CacheType>) {
 	const exists = await db.query.games.findFirst({

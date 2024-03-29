@@ -2,8 +2,9 @@ import { ChatInputCommandInteraction, CacheType } from 'discord.js'
 
 // TODO: Make it use embeds
 
-export const startingMessage = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-    await interaction.reply('lol')
+export const startingMessage = async (interaction: ChatInputCommandInteraction<CacheType>, secret: string, lives: number) => {
+    if (!interaction.channel) return // FU TYPESCRIPT!!!!
+    await interaction.channel.send(`New Game! Secret word by: ${interaction.user.username}. Secret word has ${secret.length} characters. You have ${lives} attempts. Good luck!`)
 }
 
 export const winMessage = async (interaction: ChatInputCommandInteraction<CacheType>) => {
