@@ -32,18 +32,6 @@ export async function isGameActive(interaction: ChatInputCommandInteraction<Cach
 	return true
 }
 
-export async function isUserAllowed(interaction: ChatInputCommandInteraction<CacheType>) {
-	const exists = await db.query.games.findFirst({
-		where: and(
-			eq(games.channelId, interaction.channelId),
-			eq(games.status, 'inprogress'),
-			eq(games.creatorId, interaction.user.id)
-		)
-	})
-	if (exists === undefined) return true
-	return false
-}
-
 export async function winGame(interaction: ChatInputCommandInteraction<CacheType>) {
 	await db.update(games).set({
 		status: 'won'

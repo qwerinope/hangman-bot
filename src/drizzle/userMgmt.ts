@@ -1,6 +1,7 @@
 import db from './setup.js'
-import { user } from './schema.js'
-import { eq } from 'drizzle-orm'
+import { ChatInputCommandInteraction, CacheType } from 'discord.js'
+import { user, games } from './schema.js'
+import { eq, and } from 'drizzle-orm'
 
 export async function userExists(userid: string) {
 	const exists = await db.query.user.findFirst({
@@ -15,3 +16,16 @@ export async function createUser(userid: string) {
 		userId: userid
 	})
 }
+
+export async function isUserAllowed(interaction: ChatInputCommandInteraction<CacheType>) {
+	const exists = await db.query.games.findFirst({
+		where: and(
+			eq(games.channelId, interaction.channelId),
+			eq(games.status, 'inprogress'),
+			eq(games.creatorId, interaction.user.id)
+		)
+	})
+	if (exists === undefined) return true
+	return false
+}
+

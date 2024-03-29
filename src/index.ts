@@ -1,4 +1,4 @@
-import { ActivityType, Client, Events, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, Events, GatewayIntentBits, ChannelType } from "discord.js";
 import { register } from "./register.js";
 import * as startGame from "./commands/startGame.js";
 import * as guess from './commands/guess.js'
@@ -29,6 +29,10 @@ client.once(Events.ClientReady, async c => {
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return
 
+    // Check if the bot is in a channel or not. It needs to be in a Channel for proper functioning. Might add a command to check the user stats eventually. If so place that command handler BEFORE this code.
+    if (interaction.channel === null || interaction.channel.type !== ChannelType.GuildText) { await interaction.reply('This bot doesn\'t work in DM\s. Please use the command in a server.'); return }
+
+
     // Check if the user exists. If not, create a new entry in the database.
     const userid = interaction.user.id
     const existance = await userExists(userid)
@@ -37,7 +41,6 @@ client.on(Events.InteractionCreate, async interaction => {
     if (interaction.commandName === 'hangman') await startGame.execute(interaction)
     else if (interaction.commandName === 'guess') await guess.execute(interaction)
 })
-
 
 client.login(token);
 

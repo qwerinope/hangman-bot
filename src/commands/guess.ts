@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { createGuess } from '../drizzle/guessMgmt.js'
-import { isGameActive, isUserAllowed } from '../drizzle/gameMgmt.js'
+import { isGameActive } from '../drizzle/gameMgmt.js'
+import { isUserAllowed } from '../drizzle/userMgmt.js'
 
 export const command = new SlashCommandBuilder()
     .setName('guess')

@@ -20,7 +20,7 @@ export async function execute(interaction: ChatInputCommandInteraction<CacheType
         await interaction.reply("Can't have more than one game active in a single channel.")
         return
     }
-    await interaction.reply({ ephemeral: true, content: 'Starting game.' })
+    await interaction.reply({ ephemeral: true, content: 'Starting game. Secret word is: ' + secretword + '. Don\'t share it!' })
 
     if (!interaction.channel) return // FUCK. THIS. AGAIN!!
 
