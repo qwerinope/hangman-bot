@@ -22,7 +22,7 @@ export async function createGame(secret: string, interaction: ChatInputCommandIn
 
 export async function isGameActive(interaction: ChatInputCommandInteraction<CacheType>) {
 	const exists = await db.query.games.findFirst({
-		where: (games, { eq, and }) => and(
+		where: and(
 			eq(games.channelId, interaction.channelId),
 			eq(games.status, 'inprogress')
 		)
@@ -33,7 +33,7 @@ export async function isGameActive(interaction: ChatInputCommandInteraction<Cach
 
 export async function isUserAllowed(interaction: ChatInputCommandInteraction<CacheType>) {
 	const exists = await db.query.games.findFirst({
-		where: (games, { eq, and }) => and(
+		where: and(
 			eq(games.channelId, interaction.channelId),
 			eq(games.status, 'inprogress'),
 			eq(games.creatorId, interaction.user.id)
@@ -56,6 +56,17 @@ export async function winGame(interaction: ChatInputCommandInteraction<CacheType
 }
 
 export async function loseGame(interaction: ChatInputCommandInteraction<CacheType>) {
+	const data = await db.select({
+		secret: games.secretWord
+	}).from(games).where(
+		and(
+			eq(games.channelId, interaction.channelId),
+			eq(games.status, 'inprogress')
+		)
+	)
+
+	const { secret } = data[0]
+
 	await db.update(games).set({
 		status: 'lost'
 	}).where(
@@ -64,6 +75,6 @@ export async function loseGame(interaction: ChatInputCommandInteraction<CacheTyp
 			eq(games.status, 'inprogress')
 		)
 	)
-	// TODO: Make it pass the secret instead of 'lol'
-	await messages.loseMessage(interaction, 'lol')
+
+	await messages.loseMessage(interaction, secret)
 }
