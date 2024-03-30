@@ -4,6 +4,9 @@ import { loseGame } from './gameMgmt.js'
 import { games } from './schema.js';
 import { eq, and } from 'drizzle-orm'
 import { wrongCharMessage, wrongWordMessage } from '../messages.js'
+import { createPreview } from './previewCreator.js'
+
+// TODO: make calculateLives() actually do something LOL
 
 export function calculateLives(secret: string) {
 	return secret.length
@@ -33,8 +36,7 @@ export async function loseLife(interaction: ChatInputCommandInteraction<CacheTyp
 			)
 		)
 
-		if (charMode) await wrongCharMessage(interaction, lives - 1)
-		else await wrongWordMessage(interaction, lives - 1)
-
+		if (charMode) await wrongCharMessage(interaction, lives - 1, await createPreview(interaction))
+		else await wrongWordMessage(interaction, lives - 1, await createPreview(interaction))
 	}
 }

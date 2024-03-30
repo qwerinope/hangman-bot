@@ -4,6 +4,7 @@ import { calculateLives } from './livesMgmt.js'
 import db from './setup.js';
 import { games } from './schema.js';
 import * as messages from '../messages.js'
+import { createPreview } from './previewCreator.js'
 
 export async function createGame(secret: string, interaction: ChatInputCommandInteraction<CacheType>) {
 	const user = interaction.user.id
@@ -17,7 +18,7 @@ export async function createGame(secret: string, interaction: ChatInputCommandIn
 		incorrectGuessesRemaining: lives
 	});
 
-	await messages.startingMessage(interaction, secret, lives)
+	await messages.startingMessage(interaction, secret, lives, await createPreview(interaction))
 
 }
 

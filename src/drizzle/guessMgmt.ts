@@ -5,6 +5,7 @@ import { winGame } from './gameMgmt.js'
 import { correctCharMessage } from '../messages.js'
 import { guesses, games } from './schema.js'
 import { loseLife } from './livesMgmt.js'
+import { createPreview } from './previewCreator.js'
 
 export async function createGuess(interaction: ChatInputCommandInteraction<CacheType>, guess: string) {
 	const results = await db.select({
@@ -22,14 +23,6 @@ export async function createGuess(interaction: ChatInputCommandInteraction<Cache
 
 	const correct = secretword.includes(guess) || secretword === guess
 
-	if (correct && guess.length === 1) {
-		await correctCharMessage(interaction, lives)
-	} else if (correct) {
-		await winGame(interaction)
-	} else {
-		await loseLife(interaction, guess.length === 1)
-	}
-
 	await db.insert(guesses).values({
 		gameId: gameId,
 		userId: interaction.user.id,
@@ -37,4 +30,12 @@ export async function createGuess(interaction: ChatInputCommandInteraction<Cache
 		guessType: guess.length === 1 ? 'char' : 'word',
 		isCorrect: correct
 	})
+
+	if (correct && guess.length === 1) {
+		await correctCharMessage(interaction, lives, await createPreview(interaction))
+	} else if (correct) {
+		await winGame(interaction)
+	} else {
+		await loseLife(interaction, guess.length === 1)
+	}
 }
