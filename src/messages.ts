@@ -20,7 +20,6 @@ export const loseMessage = async (interaction: ChatInputCommandInteraction<Cache
 
 export const wrongWordMessage = async (interaction: ChatInputCommandInteraction<CacheType>, lives: number, visualizer: string) => {
     const wrongWordGuess = interaction.options.get('input')?.value!.toString()
-    await interaction.reply("The word \'" + wrongWordGuess + "\' isn't it!\nYou have " + lives + " attempts remaining.")
     await interaction.reply(`The word '${wrongWordGuess}' isn't it!\nYou have ${lives} attempts remaining.${visualizerstring(visualizer)}`)
 }
 

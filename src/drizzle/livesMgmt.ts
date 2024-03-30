@@ -6,10 +6,10 @@ import { eq, and } from 'drizzle-orm'
 import { wrongCharMessage, wrongWordMessage } from '../messages.js'
 import { createPreview } from './previewCreator.js'
 
-// TODO: make calculateLives() actually do something LOL
-
 export function calculateLives(secret: string) {
-	return secret.length
+	if (secret.length <= 15) return 15
+	else if (secret.length >= 26) return 26
+	else return secret.length
 }
 
 export async function loseLife(interaction: ChatInputCommandInteraction<CacheType>, charMode: boolean) {

@@ -16,6 +16,8 @@ export async function execute(interaction: ChatInputCommandInteraction<CacheType
     // The following code is fucking useless but typescript need it
     if (!secretword) return
 
+    if (!await doesWordExist(secretword, interaction)) return
+
     if (await isGameActive(interaction)) {
         await interaction.reply("Can't have more than one game active in a single channel.")
         return
@@ -31,4 +33,15 @@ export async function execute(interaction: ChatInputCommandInteraction<CacheType
         console.error(error)
     }
 
+}
+
+async function doesWordExist(word: string, interaction: ChatInputCommandInteraction<CacheType>) {
+    const request = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+    const data = await request.json()
+    console.log(data)
+
+    if (data?.title === "No Definitions Found") {
+        await interaction.reply({ ephemeral: true, content: `${word} is to my knowledge not a real word.` })
+        return false
+    } else return true
 }
