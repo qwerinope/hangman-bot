@@ -1,34 +1,60 @@
-import { ChatInputCommandInteraction, CacheType } from 'discord.js'
+import { ChatInputCommandInteraction, CacheType, EmbedBuilder } from 'discord.js'
 
-// TODO: Make it use embeds
-
-const visualizerstring = ((visualizer: string) => `\`\`\`${visualizer}\`\`\``)
+const visualizerstring = ((visualizer: string) => `\n\`${visualizer}\``)
 
 export const startingMessage = async (interaction: ChatInputCommandInteraction<CacheType>, secret: string, lives: number, visualizer: string) => {
     if (!interaction.channel) return // FU TYPESCRIPT!!!!
-    await interaction.channel.send(`New Game! Secret word by: ${interaction.user.username}. Secret word has ${secret.length} characters. You have ${lives} attempts. Good luck!${visualizerstring(visualizer)}`)
+    const embed = new EmbedBuilder()
+        .setTitle("New game!")
+        .setColor(0x0000ff)
+        .setDescription(`Secret word selected by: ${interaction.user.username}.\nSecret word has ${secret.length} characters.\nGood luck!\nGuess for the word or characters with the \`/guess\` command.${visualizerstring(visualizer)}`)
+        .addFields({ name: "Attempts remaining", value: `You have ${lives} attemps.` })
+    await interaction.channel.send({ embeds: [embed] })
 }
 
 export const winMessage = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     const correctWordGuess = interaction.options.get('input')?.value!.toString()
-    await interaction.reply(`You win! The answer was: '${correctWordGuess}'!`)
+    const embed = new EmbedBuilder()
+        .setTitle("You win!")
+        .setColor(0x00ff00)
+        .setDescription(`You win! The answer was:\n\`${correctWordGuess}\``)
+    await interaction.reply({ embeds: [embed] })
 }
 
 export const loseMessage = async (interaction: ChatInputCommandInteraction<CacheType>, secret: string) => {
-    await interaction.reply(`BOOO!! YOU SUUUCKK!! The secret word was: '${secret}'.`)
+    const embed = new EmbedBuilder()
+        .setTitle("You lose!")
+        .setColor(0xff0000)
+        .setDescription(`You lose! The answer was:${visualizerstring(secret)}`)
+    await interaction.reply({ embeds: [embed] })
 }
 
 export const wrongWordMessage = async (interaction: ChatInputCommandInteraction<CacheType>, lives: number, visualizer: string) => {
     const wrongWordGuess = interaction.options.get('input')?.value!.toString()
-    await interaction.reply(`The word '${wrongWordGuess}' isn't it!\nYou have ${lives} attempts remaining.${visualizerstring(visualizer)}`)
+    const embed = new EmbedBuilder()
+        .setTitle("Wrong! Try again")
+        .setColor(0xff0000)
+        .setDescription(`The word: \`${wrongWordGuess}\` is wrong!. Try again.${visualizerstring(visualizer)}`)
+        .addFields({ name: "Attempts remaining", value: `You have ${lives} attemps left.` })
+    await interaction.reply({ embeds: [embed] })
 }
 
 export const correctCharMessage = async (interaction: ChatInputCommandInteraction<CacheType>, lives: number, visualizer: string) => {
     const correctCharGuess = interaction.options.get('input')?.value!.toString()
-    await interaction.reply(`The character '${correctCharGuess}' is found in the word!\nYou have ${lives} attempts remaining.${visualizerstring(visualizer)}`)
+    const embed = new EmbedBuilder()
+        .setTitle("Correct!")
+        .setColor(0x00ff00)
+        .setDescription(`The character: \`${correctCharGuess}\` is correct!.${visualizerstring(visualizer)}`)
+        .addFields({ name: "Attempts remaining", value: `You have ${lives} attemps left.` })
+    await interaction.reply({ embeds: [embed] })
 }
 
 export const wrongCharMessage = async (interaction: ChatInputCommandInteraction<CacheType>, lives: number, visualizer: string) => {
     const wrongCharGuess = interaction.options.get('input')?.value!.toString()
-    await interaction.reply(`The character '${wrongCharGuess}' isn't found in the word!\nYou have ${lives} attempts remaining.${visualizerstring(visualizer)}`)
+    const embed = new EmbedBuilder()
+        .setTitle("Wrong! Try again")
+        .setColor(0xff0000)
+        .setDescription(`The character: \`${wrongCharGuess}\` is wrong! Try again. ${visualizerstring(visualizer)}`)
+        .addFields({ name: "Attempts remaining", value: `You have ${lives} attemps left.` })
+    await interaction.reply({ embeds: [embed] })
 }
