@@ -12,6 +12,8 @@ COPY yarn.lock /usr/src/app
 
 RUN yarn
 
+RUN yarn exec tsc
+
 COPY . /usr/src/app
 
-CMD ["yarn", "start"]
+CMD ["node", "dist/index.js"]
