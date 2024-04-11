@@ -28,7 +28,7 @@ volumes:
   db: 
 ```
 
-once docker compose is running, run `docker compose run hangman yarn createdb` to setup the database correctly
+once docker compose is running, run `docker compose exec hangman yarn createdb` to setup the database correctly
 
 also rename .example.env to .env and put the correct data in it in regards to the discord bot
 
